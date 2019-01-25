@@ -1,0 +1,214 @@
+package com.example.imagebrowser;
+
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Adapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class FirstActivity extends AppCompatActivity implements View.OnClickListener{
+    private ListView naruto;
+    private String[] data = new String[1000];
+    private String[] data1 = new String[1000];
+    private String[] data2 = new String[1000];
+    private int[] number = new int[1000];
+    private MyDatabaseHelper deHelper;
+    private List<Map<String, Object>> list_map = new ArrayList<Map<String, Object>>();
+    public String tip;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_first);
+        ActionBar actionBar = getSupportActionBar();    //自定义布局（类似于苹果）
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+
+        Button button = (Button) findViewById(R.id.button);        //引用控件
+        Button button1 = (Button) findViewById(R.id.button4);
+        button.setOnClickListener(this);
+        button1.setOnClickListener(this);
+
+        //查询数据库
+        deHelper = new MyDatabaseHelper(this,"NoteStore.db",null,2);
+        SQLiteDatabase db = deHelper.getWritableDatabase();
+        Cursor cursor = db.query("Note",null,null,
+                null,null,null,null);
+
+        //从表Note中取值
+
+            int k = 0;
+            if (cursor.moveToFirst()) {
+                do {
+
+                    data[k] = cursor.getString(cursor.getColumnIndex("title"));
+                    data1[k] = cursor.getString(cursor.getColumnIndex("notes"));
+                    data2[k] = cursor.getString(cursor.getColumnIndex("time"));
+                    k++;
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+
+            //显示列表界面
+            naruto = (ListView) findViewById(R.id.naruto);
+            for (int i = 0; i < k; i++) {
+                Map<String, Object> items = new HashMap<String, Object>();
+                items.put("name", data[i]);
+                items.put("name1", data1[i]);
+                items.put("name2", data2[i]);
+                list_map.add(items);
+            }
+            final SimpleAdapter simpleAdapter = new SimpleAdapter(FirstActivity.this,
+                    list_map,
+                    R.layout.naruto_item,
+                    new String[]{"name", "name1", "name2"},
+                    new int[]{R.id.textView, R.id.textView3, R.id.textView6});
+            naruto.setAdapter(simpleAdapter);
+            registerForContextMenu(naruto);
+
+
+
+
+        //为列表创建点击事件
+        naruto.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Map map =list_map.get(position);
+                tip="Loading";
+                tdshow();
+                Intent intent1 = new Intent(FirstActivity.this,ThirdActivity.class);
+                String name = map.get("name").toString();
+                String con = map.get("name1").toString();
+                String ti = map.get("name2").toString();
+                Bundle bundle = new Bundle();
+                bundle.putString("name",name);
+                bundle.putString("con",con);
+                bundle.putString("ti",ti);
+                intent1.putExtras(bundle);
+                startActivity(intent1);
+                finish();
+            }
+        });
+
+        //列表长按删除
+        naruto.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                new AlertDialog.Builder(FirstActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("核能警告")
+                        .setMessage("老哥，这里面可能有你和妹子的重要回忆\n确定删除?")
+                        .setPositiveButton("不管了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                Map map1 =list_map.get(position);
+                                String name1 = map1.get("name").toString();
+                                MyDatabaseHelper dphelper1 = new MyDatabaseHelper(FirstActivity.this,"NoteStore.db",null,2);
+                                SQLiteDatabase db = dphelper1.getWritableDatabase();
+                                db.delete("Note","title = ?", new String[]{name1});
+                                tip="您删除了该笔记";
+                                tdshow();
+                                Intent intent2 = new Intent(FirstActivity.this,FirstActivity.class);
+                                startActivity(intent2);
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("那还是算了吧", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                tip="您取消了删除";
+                                tdshow();
+                            }
+                        }).create().show();
+                return true;
+            }
+        });
+
+
+
+    }
+
+    //自定义Toast
+    public void tdshow()
+    {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        @SuppressLint("InflateParams")
+        View toast_layout = inflater.inflate(R.layout.new_toast, null);
+        Toast toast = new Toast(this);
+        TextView tv = (TextView)toast_layout.findViewById(R.id.pp);
+        tv.setText(tip);
+        toast.setView(toast_layout);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.BOTTOM, 0, 0);
+        toast.show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.button4:
+                final Intent intent = new Intent(FirstActivity.this,SecendActivity.class);
+                startActivity(intent);
+                break;
+            case  R.id.button:
+                final View view=View.inflate(FirstActivity.this,R.layout.search,null);
+
+                 new AlertDialog.Builder(FirstActivity.this)
+                         .setTitle("SEARCH")
+                         .setView(view)
+                         .setPositiveButton("SEARCH", new DialogInterface.OnClickListener() {
+                             @Override
+                             public void onClick(DialogInterface dialog, int which) {
+                                 tip="正在搜索，请稍后";
+                                 tdshow();
+                                 EditText t = (EditText)view.findViewById(R.id.editText3);
+                                String c;
+                                 c = t.getText().toString();
+                                      Intent intent3 = new Intent(FirstActivity.this,FifthActivity.class);
+                                 Bundle bundle1 = new Bundle();
+                                 bundle1.putString("eo",c);
+                                 intent3.putExtras(bundle1);
+                                 startActivity(intent3);
+                             }
+                         })
+                         .setNegativeButton("BACK", new DialogInterface.OnClickListener() {
+                             @Override
+                             public void onClick(DialogInterface dialog, int which) {
+                                 tip="已取消搜索";
+                                 tdshow();
+                             }
+                         }).create().show();
+
+
+        }
+    }
+
+
+
+}
+

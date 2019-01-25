@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <Button
+        android:id="@+id/button9"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+
+        android:background="@drawable/textview_boarder"
+        android:text="BACK"
+        android:textColor="@android:color/background_light"
+        android:textSize="14sp"
+        android:typeface="serif"
+        tools:text="BACK" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="#FF792608"
+        android:fontFamily="casual"
+        android:text="WRITING"
+
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp"
+        tools:text="WRITING" />
+
+    <Button
+        android:id="@+id/button10"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+
+        android:background="@drawable/textview_boarder"
+        android:text="DONE"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_light"
+        android:typeface="serif"
+        tools:text="DONE" />
+</LinearLayout>

@@ -1,0 +1,68 @@
+package com.example.imagebrowser;
+
+import android.content.Intent;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class ThirdActivity extends AppCompatActivity implements View.OnClickListener {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_third);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+        TextView t = (TextView)findViewById(R.id.textView4);
+        TextView c = (TextView)findViewById(R.id.textView5);
+        TextView time = (TextView) findViewById(R.id.textView2);
+
+        Button button1 = (Button) findViewById(R.id.button7);
+        Button button2 = (Button) findViewById(R.id.button8);
+        button1.setOnClickListener(this);
+        button2.setOnClickListener(this);
+
+        Bundle bundle =this.getIntent().getExtras();     //提取bundle中的信息
+        String name = bundle.getString("name");
+        String con = bundle.getString("con");
+        String ti = bundle.getString("ti");
+        t.setText(name);
+        c.setText(con);
+        time.setText(ti);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId())
+        {
+            case R.id.button7:         //退出当前界面
+                Intent intent6 = new Intent(ThirdActivity.this,FirstActivity.class);
+                startActivity(intent6);
+                finish();
+                break;
+            case R.id.button8:                                                      //修改当前文档
+                TextView title = (TextView)findViewById(R.id.textView4);
+                TextView context = (TextView)findViewById(R.id.textView5);
+                TextView tim = (TextView) findViewById(R.id.textView2);
+                String t = title.getText().toString();
+                String c =context.getText().toString();
+                String time =tim.getText().toString();
+                Toast.makeText(this,"开始编辑",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ThirdActivity.this,FourthActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("title",t);
+                bundle.putString("context",c);
+                bundle.putString("tim",time);
+                intent.putExtras(bundle);
+                startActivity(intent);
+                finish();
+                break;
+        }
+    }
+}

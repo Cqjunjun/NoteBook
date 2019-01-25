@@ -1,0 +1,34 @@
+package com.example.imagebrowser;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class MyDatabaseHelper extends SQLiteOpenHelper{
+    public static final String CREATE_NOTE = "create table Note ( "
+            +"id integer primary key autoincrement,"
+            +"title text,"
+            +"notes text,"
+            +"time text"
+            + ")";
+
+    private  Context mContext;
+    public MyDatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version)
+    {
+        super(context, name, factory, version);       //name为数据库名
+         mContext=context;
+    }
+
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {    //数据库第一次创建时回调此方法
+        System.out.println("创建数据库和表");
+        db.execSQL(CREATE_NOTE);
+    }
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { //数据库的版本号更新时回调此方法
+        System.out.println("更新数据库版本为:"+newVersion);
+        db.execSQL("drop table if exists Note");
+        onCreate(db);
+    }
+}
